@@ -700,7 +700,14 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
     'c11.jpg','c12.jpg','c13.JPG','c14.jpg','c15.JPG'
   ];
 
-  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+  const shuffle = arr => {
+  const newArr = [...arr];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+};
 
   // Each col gets a different rhythm of tall/short heights
   const heightPatterns = [
@@ -718,8 +725,7 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   const track = document.getElementById('mosaicTrack');
   if (!track) return;
 
-  function buildCols(imgs) {
-    const shuffled = shuffle(imgs);
+  function buildCols(shuffled) {
     const fragment = document.createDocumentFragment();
     for (let c = 0; c < COLS; c++) {
       const col = document.createElement('div');
@@ -744,7 +750,10 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   }
 
   // Build 3 sets for a smooth infinite loop
-  for (let i = 0; i < 3; i++) track.appendChild(buildCols(images));
+  for (let i = 0; i < 3; i++) {
+  const shuffledSet = shuffle(images);
+  track.appendChild(buildCols(shuffledSet));
+}
 
   const setWidth = COLS * (COL_W + GAP);
   track.style.width = (setWidth * 3) + 'px';
