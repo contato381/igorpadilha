@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://igorpadilha.com.br/sitemap.xml
