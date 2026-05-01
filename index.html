@@ -761,7 +761,9 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   track.style.gap = GAP + 'px';
 
   let pos = 0;
-  const speed = 0.45;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const baseSpeed = 0.45;
+  const speed = isMobile ? baseSpeed * 1.1 : baseSpeed;
   let paused = false;
 
   track.addEventListener('mouseenter', () => paused = true);
