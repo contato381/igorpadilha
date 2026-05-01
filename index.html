@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Igor Padilha — Direção Artística</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-192.png">
+
+<!-- Open Graph / Social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Igor Padilha — Direção Artística">
+<meta property="og:description" content="Direção artística, roteiro e gestão de conteúdo para eventos corporativos. Do conceito à execução.">
+<meta property="og:image" content="og_image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Igor Padilha — Direção Artística">
+<meta name="twitter:image" content="og_image.jpg">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@100;200;300&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
@@ -282,6 +298,7 @@
     overflow: hidden;
     margin: 0 -48px;
     cursor: none;
+    touch-action: pan-y;
   }
   .mosaic-track {
     display: flex;
@@ -416,7 +433,7 @@
 
 <div class="photo-section">
   <div class="photo-col reveal">
-    <img src="igor_photo.JPG" alt="Igor Padilha">
+    <img src="igor_photo.jpg" alt="Igor Padilha">
     <div class="photo-col-overlay"></div>
   </div>
   <div class="photo-text-col reveal">
@@ -696,18 +713,11 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 (function() {
   const images = [
     'c01.jpg','c02.jpg','c03.jpg','c04.jpg','c05.jpg',
-    'c06.JPG','c07.jpg','c08.jpg','c09.JPG','c10.JPG',
-    'c11.jpg','c12.jpg','c13.JPG','c14.jpg','c15.JPG'
+    'c06.jpg','c07.jpg','c08.jpg','c09.jpg','c10.jpg',
+    'c11.jpg','c12.jpg','c13.jpg','c14.jpg','c15.jpg'
   ];
 
-  const shuffle = arr => {
-  const newArr = [...arr];
-  for (let i = newArr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-  }
-  return newArr;
-};
+  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
 
   // Each col gets a different rhythm of tall/short heights
   const heightPatterns = [
@@ -725,7 +735,8 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   const track = document.getElementById('mosaicTrack');
   if (!track) return;
 
-  function buildCols(shuffled) {
+  function buildCols(imgs) {
+    const shuffled = shuffle(imgs);
     const fragment = document.createDocumentFragment();
     for (let c = 0; c < COLS; c++) {
       const col = document.createElement('div');
@@ -750,10 +761,7 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   }
 
   // Build 3 sets for a smooth infinite loop
-  for (let i = 0; i < 3; i++) {
-  const shuffledSet = shuffle(images);
-  track.appendChild(buildCols(shuffledSet));
-}
+  for (let i = 0; i < 3; i++) track.appendChild(buildCols(images));
 
   const setWidth = COLS * (COL_W + GAP);
   track.style.width = (setWidth * 3) + 'px';
@@ -767,15 +775,36 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   track.addEventListener('mouseenter', () => paused = true);
   track.addEventListener('mouseleave', () => paused = false);
 
-  function tick() {
-  if (!paused) {
-    pos += speed;
+  // Touch support for mobile — listeners no outer (superfície visível)
+  const outer = track.parentElement;
+  let touchLastX = 0;
+
+  outer.addEventListener('touchstart', e => {
+    touchLastX = e.touches[0].clientX;
+    paused = true;
+  }, { passive: true });
+
+  outer.addEventListener('touchmove', e => {
+    const dx = touchLastX - e.touches[0].clientX;
+    touchLastX = e.touches[0].clientX;
+    pos += dx;
+    if (pos < 0) pos += setWidth;
     if (pos >= setWidth) pos -= setWidth;
     track.style.transform = `translateX(-${pos}px)`;
+  }, { passive: true });
+
+  outer.addEventListener('touchend', () => { paused = false; });
+  outer.addEventListener('touchcancel', () => { paused = false; });
+
+  function tick() {
+    if (!paused) {
+      pos += speed;
+      if (pos >= setWidth) pos -= setWidth;
+      track.style.transform = `translateX(-${pos}px)`;
+    }
+    requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
- }
- requestAnimationFrame(tick);
 })();
 </script>
 </body>
