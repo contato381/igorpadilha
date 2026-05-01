@@ -767,54 +767,15 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   track.addEventListener('mouseenter', () => paused = true);
   track.addEventListener('mouseleave', () => paused = false);
 
- // Mobile touch drag
-let isDragging = false;
-let startX = 0;
-let startPos = 0;
-
-const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
-
-track.addEventListener('touchstart', (e) => {
-  if (!isMobile()) return;
-
-  isDragging = true;
-  paused = true;
-  startX = e.touches[0].clientX;
-  startPos = pos;
-}, { passive: true });
-
-track.addEventListener('touchmove', (e) => {
-  if (!isMobile() || !isDragging) return;
-
-  const currentX = e.touches[0].clientX;
-  const diff = startX - currentX;
-
-  pos = startPos + diff;
-
-  if (pos < 0) pos += setWidth;
-  if (pos >= setWidth) pos -= setWidth;
-
-  track.style.transform = `translateX(-${pos}px)`;
-}, { passive: true });
-
-track.addEventListener('touchend', () => {
-  if (!isMobile()) return;
-
-  isDragging = false;
-
-  setTimeout(() => {
-    paused = false;
-  }, 800);
-});
-
   function tick() {
-  if (!paused && !isDragging) {
+  if (!paused) {
     pos += speed;
     if (pos >= setWidth) pos -= setWidth;
     track.style.transform = `translateX(-${pos}px)`;
   }
   requestAnimationFrame(tick);
-}
+ }
+ requestAnimationFrame(tick);
 })();
 </script>
 </body>
