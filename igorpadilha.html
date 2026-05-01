@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Igor Padilha — Direção Artística</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-192.png">
+
+<!-- Open Graph / Social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Igor Padilha — Direção Artística">
+<meta property="og:description" content="Direção artística, roteiro e gestão de conteúdo para eventos corporativos. Do conceito à execução.">
+<meta property="og:image" content="og_image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Igor Padilha — Direção Artística">
+<meta name="twitter:image" content="og_image.jpg">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@100;200;300&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
@@ -282,6 +298,7 @@
     overflow: hidden;
     margin: 0 -48px;
     cursor: none;
+    touch-action: pan-y;
   }
   .mosaic-track {
     display: flex;
@@ -758,20 +775,16 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   track.addEventListener('mouseenter', () => paused = true);
   track.addEventListener('mouseleave', () => paused = false);
 
-  // Touch support for mobile
-  let touchStartX = 0;
+  // Touch support for mobile — listeners no outer (superfície visível)
+  const outer = track.parentElement;
   let touchLastX = 0;
-  let isTouching = false;
 
-  track.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-    touchLastX = touchStartX;
-    isTouching = true;
+  outer.addEventListener('touchstart', e => {
+    touchLastX = e.touches[0].clientX;
     paused = true;
   }, { passive: true });
 
-  track.addEventListener('touchmove', e => {
-    if (!isTouching) return;
+  outer.addEventListener('touchmove', e => {
     const dx = touchLastX - e.touches[0].clientX;
     touchLastX = e.touches[0].clientX;
     pos += dx;
@@ -780,10 +793,8 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
     track.style.transform = `translateX(-${pos}px)`;
   }, { passive: true });
 
-  track.addEventListener('touchend', () => {
-    isTouching = false;
-    paused = false;
-  });
+  outer.addEventListener('touchend', () => { paused = false; });
+  outer.addEventListener('touchcancel', () => { paused = false; });
 
   function tick() {
     if (!paused) {
